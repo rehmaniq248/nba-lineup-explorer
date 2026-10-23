@@ -1,0 +1,262 @@
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light;
+  @include mat.theme((
+    color: (
+      theme-type: light,
+      primary: mat.$blue-palette,
+    ),
+    typography: (plain-family: 'Helvetica Neue, Helvetica, Arial, sans-serif', brand-family: 'Helvetica Neue, Helvetica, Arial, sans-serif'),
+    density: 0,
+  ));
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+// Industrial blueprint theme in NBA colours: red #C8102E, blue #1D428A, black and white.
+// `data-theme` is set by ThemeService; dark is the default. Blue and red are lifted a step in dark mode so
+// marks keep their contrast on black.
+:root,
+:root[data-theme='dark'] {
+  --bg: #0a0a0b;
+  --bg-raised: #050506;
+  --panel: #141417;
+  --panel-2: #1d1d22;
+  --border: rgba(255, 255, 255, 0.24);
+  --line: #e9e9ec;
+  --text: #ffffff;
+  --text-muted: #a8a8b0;
+  --accent: #ffffff;
+  --accent-ink: #0a0a0b;
+  --lineup: #3f72d9;
+  --opponent: #e3243f;
+  --accent-2: #e3243f;
+  --accent-3: #3f72d9;
+  --court-line: #d5d5da;
+  --grid-minor: rgba(63, 114, 217, 0.13);
+  --grid-major: rgba(63, 114, 217, 0.3);
+  --dot: rgba(255, 255, 255, 0.06);
+  --scanline: rgba(0, 0, 0, 0.08);
+  --shadow: 6px 6px 0 #000000;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f4f5f7;
+  --bg-raised: #e8eaee;
+  --panel: #ffffff;
+  --panel-2: #eef0f4;
+  --border: rgba(10, 10, 11, 0.24);
+  --line: #0a0a0b;
+  --text: #0a0a0b;
+  --text-muted: #55575f;
+  --accent: #1d428a;
+  --accent-ink: #ffffff;
+  --lineup: #1d428a;
+  --opponent: #c8102e;
+  --accent-2: #c8102e;
+  --accent-3: #1d428a;
+  --court-line: #55575f;
+  --grid-minor: rgba(29, 66, 138, 0.07);
+  --grid-major: rgba(29, 66, 138, 0.16);
+  --dot: rgba(10, 10, 11, 0.08);
+  --scanline: rgba(10, 10, 11, 0.03);
+  --shadow: 5px 5px 0 #c8102e;
+  color-scheme: light;
+}
+
+:root {
+  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-data: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+// Blueprint paper: a fine 16px grid with a heavier line every 80px.
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(var(--grid-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px);
+  background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+// CRT scanlines over everything, kept faint so small text stays crisp.
+html::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, var(--scanline) 0 1px, transparent 1px 3px);
+}
+
+*:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+// Numbers read as data, so they are always bold and align in columns.
+b,
+strong,
+.num {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+// Panels are hard-edged slabs with a dot-matrix fill and registration marks in two corners.
+.card {
+  position: relative;
+  background-color: var(--panel);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 8px 8px;
+  border: 2px solid var(--line);
+  border-radius: 0;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  min-width: 0;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: -2px;
+    left: -2px;
+    border-top: 4px solid var(--opponent);
+    border-left: 4px solid var(--opponent);
+  }
+
+  &::after {
+    right: -2px;
+    bottom: -2px;
+    border-right: 4px solid var(--accent-3);
+    border-bottom: 4px solid var(--accent-3);
+  }
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px dashed var(--border);
+  flex-wrap: wrap;
+}
+
+.loading {
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+// Two-column layout used by the dashboard tabs; stacks on narrow screens.
+.tab-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.tab-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .tab-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// Stat tile used by several tabs.
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.tile {
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-left: 6px solid var(--accent-3);
+  border-radius: 0;
+  background: var(--panel-2);
+
+  .tile-label {
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .tile-value {
+    margin-top: 4px;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .tile-detail {
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+}
+
+// Marks a number that is estimated from the play-by-play rather than recorded directly.
+.approx {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px dashed var(--opponent);
+  color: var(--opponent);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  cursor: help;
+}

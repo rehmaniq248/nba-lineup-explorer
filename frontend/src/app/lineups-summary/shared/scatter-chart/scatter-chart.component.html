@@ -1,0 +1,49 @@
+<svg [attr.viewBox]="'0 0 ' + width + ' ' + height" role="group" [attr.aria-label]="xLabel() + ' against ' + yLabel() + ' for each lineup'">
+  @for (tick of xTicks(); track tick.label) {
+    <line class="grid" [attr.x1]="tick.pos" [attr.x2]="tick.pos" [attr.y1]="plot.top" [attr.y2]="plot.bottom" />
+    <text class="tick" text-anchor="middle" [attr.x]="tick.pos" [attr.y]="plot.bottom + 16">{{ tick.label }}</text>
+  }
+  @for (tick of yTicks(); track tick.label) {
+    <line class="grid" [attr.x1]="plot.left" [attr.x2]="plot.right" [attr.y1]="tick.pos" [attr.y2]="tick.pos" />
+    <text class="tick" text-anchor="end" [attr.x]="plot.left - 8" [attr.y]="tick.pos + 4">{{ tick.label }}</text>
+  }
+
+  @if (center(); as c) {
+    <line class="center" [attr.x1]="c.x" [attr.x2]="c.x" [attr.y1]="plot.top" [attr.y2]="plot.bottom" />
+    <line class="center" [attr.x1]="plot.left" [attr.x2]="plot.right" [attr.y1]="c.y" [attr.y2]="c.y" />
+  }
+
+  <text class="quad" [attr.x]="plot.left + 6" [attr.y]="plot.top + 14">{{ quadrants()[0] }}</text>
+  <text class="quad" text-anchor="end" [attr.x]="plot.right - 6" [attr.y]="plot.top + 14">{{ quadrants()[1] }}</text>
+  <text class="quad" [attr.x]="plot.left + 6" [attr.y]="plot.bottom - 8">{{ quadrants()[2] }}</text>
+  <text class="quad" text-anchor="end" [attr.x]="plot.right - 6" [attr.y]="plot.bottom - 8">{{ quadrants()[3] }}</text>
+
+  @for (bubble of bubbles(); track bubble.key) {
+    <rect
+      class="bubble"
+      [class.selected]="bubble.key === selectedKey()"
+      [attr.x]="bubble.x - bubble.r"
+      [attr.y]="bubble.y - bubble.r"
+      [attr.width]="bubble.r * 2"
+      [attr.height]="bubble.r * 2"
+      [attr.fill]="bubble.fill"
+      tabindex="0"
+      role="button"
+      [attr.aria-label]="bubble.title"
+      (click)="selectLineup.emit(bubble.lineup)"
+      (keydown.enter)="selectLineup.emit(bubble.lineup)"
+    >
+      <title>{{ bubble.title }}</title>
+    </rect>
+  }
+
+  <text class="axis" text-anchor="middle" [attr.x]="(plot.left + plot.right) / 2" [attr.y]="height - 6">{{ xLabel() }}</text>
+  <text
+    class="axis"
+    text-anchor="middle"
+    [attr.transform]="'translate(14 ' + (plot.top + plot.bottom) / 2 + ') rotate(-90)'"
+  >
+    {{ yLabel() }}
+  </text>
+</svg>
+<p class="hint">Bubble size is possessions. Colour is net rating. Lines mark the average of the lineups shown.</p>

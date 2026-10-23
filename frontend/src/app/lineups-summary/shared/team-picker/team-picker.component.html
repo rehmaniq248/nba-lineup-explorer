@@ -1,0 +1,43 @@
+<div class="picker" [class.open]="open()">
+  <input
+    type="text"
+    role="combobox"
+    autocomplete="off"
+    placeholder="Search teams"
+    aria-label="Team"
+    aria-autocomplete="list"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="listId"
+    [attr.aria-activedescendant]="open() ? optionId(active()) : null"
+    [value]="inputValue()"
+    (input)="onInput($any($event.target).value)"
+    (focus)="onFocus()"
+    (keydown)="onKeydown($event)"
+  />
+  @if (selected() && !open()) {
+    <button type="button" class="clear" aria-label="Show all teams" (click)="clear()">×</button>
+  }
+  @if (open()) {
+    <ul class="list" role="listbox" [id]="listId">
+      @for (team of options(); track team?.team_id ?? 'all'; let index = $index) {
+        <li
+          role="option"
+          [id]="optionId(index)"
+          [class.active]="index === active()"
+          [attr.aria-selected]="(team?.team_id ?? '') === teamId()"
+          (mousedown)="$event.preventDefault()"
+          (click)="choose(team)"
+          (mouseenter)="active.set(index)"
+        >
+          @if (team) {
+            <span class="abbr">{{ team.abbreviation }}</span>{{ team.name }}
+          } @else {
+            <span class="abbr">ALL</span>All teams
+          }
+        </li>
+      } @empty {
+        <li class="none">No team matches</li>
+      }
+    </ul>
+  }
+</div>

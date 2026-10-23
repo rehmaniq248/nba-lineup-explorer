@@ -1,0 +1,41 @@
+<div class="tab-grid">
+  <section class="card">
+    <div class="card-head">
+      <h2>Offense vs. defense</h2>
+      <span class="muted">Click a bubble to select a lineup</span>
+    </div>
+    <scatter-chart
+      [lineups]="store.visible()"
+      [selectedKey]="store.selectedId()"
+      xKey="offensive_rating"
+      yKey="defensive_rating"
+      xLabel="Offensive rating (points scored per 100 possessions)"
+      yLabel="Defensive rating (best at top)"
+      [lowerYBetter]="true"
+      [quadrants]="quadrants"
+      (selectLineup)="store.select($event)"
+    />
+  </section>
+
+  <div class="tab-stack">
+    @for (list of [{ title: 'Best net rating', rows: best() }, { title: 'Worst net rating', rows: worst() }]; track list.title) {
+      <section class="card">
+        <div class="card-head">
+          <h2>{{ list.title }}</h2>
+          <span class="muted">Click a lineup to select it</span>
+        </div>
+        <ol class="rank">
+          @for (row of list.rows; track lineupKey(row)) {
+            <li [class.selected]="lineupKey(row) === store.selectedId()" tabindex="0" (click)="store.select(row)" (keydown.enter)="store.select(row)">
+              <div class="rank-top">
+                <span class="rank-names" [title]="names(row)">{{ names(row) }}</span>
+                <b>{{ signed(row.net_rating) }}</b>
+              </div>
+              <div class="rank-bar"><span [style.width.%]="width(row.net_rating)" [style.background]="color(row.net_rating)"></span></div>
+            </li>
+          }
+        </ol>
+      </section>
+    }
+  </div>
+</div>

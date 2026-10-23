@@ -1,0 +1,37 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Lineup<br />Explorer<small>NBA 2025-26</small></span>
+    </div>
+    <nav aria-label="Main">
+      <span class="nav-heading">Lineups</span>
+      @for (tab of tabs; track tab.path) {
+        <a
+          [routerLink]="'/lineups-summary' + tab.path"
+          queryParamsHandling="preserve"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >{{ tab.label }}</a>
+      }
+      <span class="nav-heading">Players</span>
+      @for (tab of playerTabs; track tab.path) {
+        <a [routerLink]="'/lineups-summary' + tab.path" queryParamsHandling="preserve" routerLinkActive="active">{{ tab.label }}</a>
+      }
+      <span class="nav-heading">Developer</span>
+      <a routerLink="/lineups-summary-api" routerLinkActive="active">API response</a>
+    </nav>
+    <button
+      type="button"
+      class="theme-toggle"
+      (click)="themeService.toggle()"
+      [attr.aria-label]="'Switch to ' + (themeService.theme() === 'dark' ? 'light' : 'dark') + ' mode'"
+    >
+      <span class="toggle-track" [class.light]="themeService.theme() === 'light'"><span class="toggle-thumb"></span></span>
+      {{ themeService.theme() === 'dark' ? 'Dark' : 'Light' }} mode
+    </button>
+  </aside>
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+.picker {
+  position: relative;
+}
+
+input {
+  box-sizing: border-box;
+  width: 210px;
+  height: 34px;
+  padding: 0 28px 0 10px;
+  border: 2px solid var(--border);
+  border-radius: 0;
+  background: var(--panel-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.open input {
+  border-color: var(--line);
+}
+
+.clear {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--opponent);
+  }
+}
+
+.list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 260px;
+  max-height: 320px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  box-shadow: var(--shadow);
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 12px;
+    font-size: 13px;
+    cursor: pointer;
+
+    &.active {
+      background: var(--accent);
+      color: var(--accent-ink);
+
+      .abbr {
+        color: inherit;
+      }
+    }
+
+    &.none {
+      color: var(--text-muted);
+      cursor: default;
+    }
+  }
+}
+
+.abbr {
+  width: 32px;
+  color: var(--lineup);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 600px) {
+  input {
+    width: 100%;
+  }
+}

@@ -1,0 +1,108 @@
+<div class="page">
+  <header class="topbar">
+    <h1>Lineup performance</h1>
+    <p class="sub">
+      How every group of players does on both ends of the floor across the 2025-26 NBA season, summed over every
+      possession they shared.
+      @if (store.meta(); as meta) {
+        <span class="coverage">{{ meta.possessions.toLocaleString() }} possessions · {{ meta.games['Regular Season'] + meta.games['Play-In'] + meta.games['Playoffs'] }} games</span>
+      }
+    </p>
+  </header>
+
+  <section class="filters" aria-label="Filters">
+    @if (!playersTab()) {
+      <div class="field">
+        <span class="field-label" id="size-label">Lineup size</span>
+        <div class="segmented" role="group" aria-labelledby="size-label">
+          @for (size of sizes; track size) {
+            <button type="button" [class.on]="store.lineupSize() === size" [attr.aria-pressed]="store.lineupSize() === size" (click)="store.setSize(size)">
+              {{ size }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="field">
+      <span class="field-label">Team</span>
+      <team-picker [teams]="store.teams()" [teamId]="store.teamId()" (teamChange)="store.setTeam($event)" />
+    </div>
+
+    <label class="field">
+      <span class="field-label">Games</span>
+      <select [ngModel]="store.gameType()" (ngModelChange)="store.setGameType($event)">
+        @for (option of gameTypes; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="field">
+      <span class="field-label" id="location-label">Venue</span>
+      <div class="segmented" role="group" aria-labelledby="location-label">
+        @for (option of locations; track option.value) {
+          <button type="button" [class.on]="store.location() === option.value" [attr.aria-pressed]="store.location() === option.value" (click)="store.setLocation(option.value)">
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label" id="clutch-label">Clutch only</span>
+      <button
+        type="button"
+        class="switch"
+        role="switch"
+        aria-labelledby="clutch-label"
+        [attr.aria-checked]="store.clutch()"
+        [class.on]="store.clutch()"
+        title="Last five minutes of the fourth quarter or overtime with the score within five"
+        (click)="store.setClutch(!store.clutch())"
+      >
+        <span class="switch-thumb"></span>
+        {{ store.clutch() ? 'On' : 'Off' }}
+      </button>
+    </div>
+
+    @if (!playersTab()) {
+      <label class="field grow">
+        <span class="field-label">Minimum possessions · <b>{{ store.minPossessions() }}</b></span>
+        <input type="range" min="0" max="1000" step="25" [ngModel]="store.minPossessions()" (ngModelChange)="store.setMinPossessions($event)" />
+      </label>
+
+      <label class="field">
+        <span class="field-label">Find a player</span>
+        <input type="search" placeholder="Player name" [ngModel]="store.search()" (ngModelChange)="store.setSearch($event)" />
+      </label>
+    }
+
+    @if (store.player(); as player) {
+      <div class="field">
+        <span class="field-label">Lineups with</span>
+        <span class="focus-chip">
+          {{ player.name }}
+          <button type="button" [attr.aria-label]="'Stop filtering to ' + player.name" (click)="store.focusPlayer(null)">×</button>
+        </span>
+      </div>
+    }
+  </section>
+
+  @if (playersTab()) {
+    <router-outlet></router-outlet>
+  } @else if (store.error()) {
+    <div class="state error" role="alert">
+      <strong>Couldn't load lineups.</strong> {{ store.error() }} Check that the backend is running, then change a filter to retry.
+    </div>
+  } @else if (!store.loading() && !store.visible().length) {
+    <div class="state">
+      <strong>No lineups match.</strong> Lower the minimum possessions or clear the filters.
+      <button type="button" (click)="store.clearFilters()">Clear filters</button>
+    </div>
+  } @else {
+    <div [class.loading]="store.loading()">
+      <router-outlet></router-outlet>
+    </div>
+  }
+</div>

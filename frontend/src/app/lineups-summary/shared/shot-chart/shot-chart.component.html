@@ -1,0 +1,35 @@
+<figure>
+  <figcaption>
+    <span class="side" [class.opponent]="chart().side === 'defense'"><i></i>{{ label() }}</span>
+    <span class="muted"><b>{{ chart().made }}</b>/<b>{{ chart().attempted }}</b> field goals</span>
+  </figcaption>
+  <svg [attr.viewBox]="'-6 -6 ' + (width + 12) + ' ' + (depth + 12)" role="img" [attr.aria-label]="label() + ' shot chart: ' + chart().attempted + ' field goal attempts'">
+    <g class="court">
+      <rect x="0" y="0" [attr.width]="width" [attr.height]="depth" />
+      <!-- Lane, free-throw circle, backboard and rim -->
+      <rect [attr.x]="width / 2 - 8 * unit" y="0" [attr.width]="16 * unit" [attr.height]="19 * unit" />
+      <circle [attr.cx]="width / 2" [attr.cy]="19 * unit" [attr.r]="6 * unit" />
+      <line [attr.x1]="width / 2 - 3 * unit" [attr.x2]="width / 2 + 3 * unit" [attr.y1]="4 * unit" [attr.y2]="4 * unit" />
+      <circle class="rim" [attr.cx]="width / 2" [attr.cy]="basketY" [attr.r]="0.75 * unit" />
+      <path [attr.d]="restrictedPath" />
+      <path [attr.d]="threePath" />
+      <!-- Half-court circle -->
+      <path [attr.d]="'M' + (width / 2 - 6 * unit) + ' ' + depth + ' A' + 6 * unit + ' ' + 6 * unit + ' 0 0 1 ' + (width / 2 + 6 * unit) + ' ' + depth" />
+    </g>
+    @for (hex of hexes(); track hex.key) {
+      <polygon class="hex" [attr.points]="hex.points" [attr.fill]="hex.fill"><title>{{ hex.title }}</title></polygon>
+    }
+    @if (!chart().attempted) {
+      <text class="empty" [attr.x]="width / 2" [attr.y]="depth / 2" text-anchor="middle">No shots under these filters</text>
+    }
+  </svg>
+</figure>
+<div class="legend" aria-hidden="true">
+  <span class="muted">FG% vs league at that spot{{ chart().side === 'defense' ? ' (flipped: blue = held below)' : '' }}</span>
+  <span class="swatches">
+    @for (step of legend; track step.label) {
+      <span class="swatch"><i [style.background]="step.color"></i>{{ step.label }}</span>
+    }
+  </span>
+  <span class="muted">Size = shot volume</span>
+</div>

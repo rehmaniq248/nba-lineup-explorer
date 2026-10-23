@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.api-inspector {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+mat-form-field {
+  margin-right: 20px;
+}
+
+pre {
+  background: var(--bg-raised);
+  color: var(--text);
+  padding: 16px;
+  border-radius: 0;
+  overflow: auto;
+  max-height: 70vh;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-left: 6px solid var(--lineup);
+  font-size: 13px;
+
+  ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    color: var(--text-muted);
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+}

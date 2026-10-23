@@ -1,0 +1,418 @@
+
+:host {
+  display: block;
+  color: var(--text);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &.grow {
+    flex: 1;
+    min-width: 180px;
+  }
+
+  input[type='range'] {
+    accent-color: var(--accent);
+    width: 100%;
+    margin: 6px 0 0;
+  }
+
+  input[type='search'] {
+    height: 34px;
+    padding: 0 10px;
+    border: 2px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+  }
+}
+
+.field-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  b {
+    color: var(--accent);
+  }
+}
+
+.state {
+  padding: 12px;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+
+  &.error {
+    border-color: var(--opponent);
+  }
+}
+
+// Bio card
+.bio-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.big-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  background: var(--lineup);
+  color: #ffffff;
+  border: 2px solid var(--line);
+  box-shadow: 4px 4px 0 var(--opponent);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.player-title {
+  margin: 2px 0;
+  font-size: 20px !important;
+  letter-spacing: 0.04em !important;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin: 0 0 14px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  dt {
+    color: var(--text-muted);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.box {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: 2px solid var(--border);
+
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0;
+    border-right: 1px solid var(--border);
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  b {
+    font-size: 18px;
+  }
+
+  span {
+    color: var(--text-muted);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+}
+
+.bio-card p {
+  margin: 8px 0 0;
+}
+
+// On / off
+.on-off-headline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  b {
+    font-size: 26px;
+  }
+
+  .diff {
+    padding-left: 12px;
+    border-left: 2px solid var(--border);
+  }
+}
+
+.split-note {
+  margin: 0 0 14px;
+
+  b {
+    color: var(--text);
+  }
+}
+
+// Best teammates
+.mates {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 8px 0;
+    border-top: 1px solid var(--border);
+  }
+}
+
+.mate-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.mate-bar {
+  height: 8px;
+  margin: 4px 0 2px;
+  background: var(--panel-2);
+
+  span {
+    display: block;
+    height: 100%;
+    mask-image: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+  }
+}
+
+.go {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--line);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--opponent);
+
+  &:hover {
+    transform: translate(-1px, -1px);
+  }
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.table-card {
+  padding-bottom: 8px;
+}
+
+.table-wrap {
+  max-height: 640px;
+  overflow: auto;
+  margin: 0 -18px;
+  padding: 0 18px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 4px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  font-weight: 500;
+
+  button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &:hover,
+    &.active {
+      color: var(--accent);
+    }
+  }
+
+  &.player-col {
+    text-align: left;
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+td {
+  padding: 9px 4px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+td.num {
+  text-align: right;
+  font-family: var(--font-data);
+  font-size: 12px;
+}
+
+tbody tr {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--panel-2);
+  }
+
+  &.selected {
+    background: var(--panel-2);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+}
+
+.player-col {
+  min-width: 170px;
+}
+
+.player-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  background: var(--panel-2);
+  border: 2px solid var(--border);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.team {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.player-name {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.net-col {
+  width: 150px;
+  min-width: 130px;
+  padding-left: 12px;
+  padding-right: 6px;
+}
+
+.net {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.net-track {
+  position: relative;
+  flex: 1;
+  height: 20px;
+}
+
+.net-axis {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--text-muted);
+  opacity: 0.6;
+}
+
+.net-bar {
+  mask-image: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+  position: absolute;
+  top: 4px;
+  height: 12px;
+  border-radius: 0;
+}
+
+.net-value {
+  width: 42px;
+  font-weight: 700;
+  text-align: right;
+  font-family: var(--font-data);
+  font-size: 11px;
+}
+

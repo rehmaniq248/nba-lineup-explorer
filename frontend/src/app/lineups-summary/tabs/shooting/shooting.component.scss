@@ -1,0 +1,118 @@
+:host {
+  display: block;
+  color: var(--text);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th,
+td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+
+thead th {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+th:first-child {
+  text-align: left;
+  font-weight: 700;
+}
+
+tbody tr:last-child > * {
+  border-bottom: none;
+}
+
+.courts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 760px) {
+  .courts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// FG% against league average, outlined in the red-to-blue scale.
+.vs {
+  display: inline-block;
+  min-width: 34px;
+  margin-left: 6px;
+  padding: 0 4px;
+  border: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.type {
+  margin-bottom: 14px;
+}
+
+.type-label {
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.type-bar {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr) 40px 40px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+.type-name {
+  color: var(--text-muted);
+}
+
+.type-track {
+  height: 10px;
+  background: var(--panel-2);
+}
+
+.type-fill {
+  display: block;
+  height: 100%;
+
+  &.lineup {
+    background: var(--lineup);
+  }
+
+  &.opponent {
+    background: var(--opponent);
+  }
+
+  &.league {
+    background: var(--text-muted);
+  }
+}
+
+.type-value,
+.type-fg {
+  text-align: right;
+}
+
+.note {
+  margin: 4px 0 0;
+}

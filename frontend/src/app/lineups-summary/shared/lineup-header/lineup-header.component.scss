@@ -1,0 +1,138 @@
+:host {
+  display: block;
+}
+
+// Detail cards
+.roster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.chip {
+  padding: 3px 10px;
+  border-radius: 0;
+  background: var(--panel-2);
+  border: 2px solid var(--border);
+  font-size: 12px;
+}
+
+.net-headline {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 18px;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+
+  small {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+}
+
+
+.header-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.team {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.roster {
+  margin-bottom: 0;
+}
+
+.net-headline {
+  margin-bottom: 0;
+}
+
+.chip small {
+  margin-left: 6px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.build b {
+  color: var(--text);
+}
+
+// Month-by-month net rating: bars above the axis are positive, below negative. Thin months are faded.
+.trend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trend-label {
+  color: var(--text-muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.trend-bars {
+  display: flex;
+  gap: 4px;
+}
+
+.trend-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+
+  &.thin {
+    opacity: 0.35;
+  }
+}
+
+.trend-plot {
+  position: relative;
+  width: 16px;
+}
+
+.trend-bar {
+  position: absolute;
+  left: 2px;
+  width: 12px;
+}
+
+.trend-axis {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  height: 1px;
+  background: var(--border);
+}
+
+.trend-month {
+  color: var(--text-muted);
+  font-size: 9px;
+}

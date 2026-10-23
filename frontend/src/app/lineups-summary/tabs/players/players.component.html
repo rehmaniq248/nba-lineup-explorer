@@ -1,0 +1,168 @@
+<div class="grid">
+  <section class="card table-card" aria-label="Player on/off leaderboard">
+    <div class="card-head">
+      <h2>On / off leaderboard</h2>
+      <span class="muted">
+        @if (total() > players().length) { Top <b>{{ players().length }}</b> of <b>{{ total() }}</b> · } Click a row to inspect it
+      </span>
+    </div>
+
+    <div class="controls">
+      <label class="field">
+        <span class="field-label">Find a player</span>
+        <input type="search" placeholder="Player name" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+      </label>
+      <label class="field grow">
+        <span class="field-label">Minimum possessions · <b>{{ minPossessions() }}</b></span>
+        <input type="range" min="0" max="8000" step="250" [ngModel]="minPossessions()" (ngModelChange)="minPossessions.set($event)" />
+      </label>
+    </div>
+
+    @if (error()) {
+      <p class="state error" role="alert">{{ error() }} Check that the backend is running.</p>
+    } @else if (!loading() && !players().length) {
+      <p class="state">No players match. Lower the minimum possessions or clear the search.</p>
+    }
+
+    <div class="table-wrap" [class.loading]="loading()">
+      <table>
+        <thead>
+          <tr>
+            <th class="player-col" scope="col">Player</th>
+            @for (column of columns; track column.sortKey) {
+              <th scope="col" [attr.aria-sort]="ariaSort(column)" [class.net-col]="column.sortKey === 'on_off_net'">
+                <button type="button" [title]="column.hint" (click)="sortOn(column)" [class.active]="sortBy() === column.sortKey">
+                  {{ column.label }}
+                  @if (sortBy() === column.sortKey) { <span aria-hidden="true">{{ order() === 'desc' ? '↓' : '↑' }}</span> }
+                </button>
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of players(); track rowKey(row)) {
+            <tr
+              [class.selected]="selected() && rowKey(row) === rowKey(selected()!)"
+              tabindex="0"
+              (click)="select(row)"
+              (keydown.enter)="select(row)"
+            >
+              <td class="player-col">
+                <div class="player-cell">
+                  <span class="avatar" aria-hidden="true">{{ initials(row.name) }}</span>
+                  <div class="names">
+                    <span class="team">{{ row.team_abbreviation }} · {{ row.position || '—' }}</span>
+                    <span class="player-name">{{ row.name }}</span>
+                  </div>
+                </div>
+              </td>
+              @for (column of columns; track column.sortKey) {
+                @if (column.sortKey === 'on_off_net') {
+                  <td class="net-col">
+                    <div class="net">
+                      <span class="net-value">{{ signed(row.on_off_net) }}</span>
+                      <div class="net-track">
+                        <div class="net-axis"></div>
+                        <div
+                          class="net-bar"
+                          [style.width.%]="barWidth(row.on_off_net)"
+                          [style.background]="color(row.on_off_net)"
+                          [style.left.%]="row.on_off_net >= 0 ? 50 : 50 - barWidth(row.on_off_net)"
+                        ></div>
+                      </div>
+                    </div>
+                  </td>
+                } @else {
+                  <td class="num">{{ cell(row, column) }}</td>
+                }
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="col">
+    @if (selected(); as p) {
+      <section class="card bio-card" aria-label="Selected player">
+        <div class="bio-head">
+          <span class="big-avatar" aria-hidden="true">{{ initials(p.name) }}</span>
+          <div>
+            <span class="team">{{ p.team_name }}</span>
+            <h2 class="player-title">{{ p.name }}</h2>
+            <span class="muted">{{ p.position || '—' }} · {{ feetInches(p.height_in) }} · {{ p.weight_lb ?? '—' }} lb · Age {{ age(p) }}</span>
+          </div>
+        </div>
+        <dl class="facts">
+          <div><dt>Draft</dt><dd>{{ draft(p) }}</dd></div>
+          <div><dt>From</dt><dd>{{ p.school || p.country || '—' }}</dd></div>
+          <div><dt>Games</dt><dd>{{ p.games }}</dd></div>
+          <div><dt>Minutes</dt><dd>{{ p.minutes_per_game.toFixed(1) }}</dd></div>
+        </dl>
+        <div class="box">
+          @for (stat of [
+            { label: 'PTS', value: p.points_per_game },
+            { label: 'REB', value: p.rebounds_per_game },
+            { label: 'AST', value: p.assists_per_game },
+            { label: 'STL', value: p.steals_per_game },
+            { label: 'BLK', value: p.blocks_per_game }
+          ]; track stat.label) {
+            <div><b>{{ stat.value.toFixed(1) }}</b><span>{{ stat.label }}</span></div>
+          }
+        </div>
+        <p class="muted">Per game, regular season box scores.</p>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>On / off</h2>
+          <span class="muted"><b>{{ p.possessions.toLocaleString() }}</b> on · <b>{{ p.off_possessions.toLocaleString() }}</b> off possessions</span>
+        </div>
+        <div class="on-off-headline">
+          <div>
+            <span class="field-label">On</span>
+            <b [style.color]="color(p.on.net_rating)">{{ signed(p.on.net_rating) }}</b>
+          </div>
+          <div>
+            <span class="field-label">Off</span>
+            <b [style.color]="color(p.off.net_rating)">{{ p.off_possessions ? signed(p.off.net_rating) : '—' }}</b>
+          </div>
+          <div class="diff">
+            <span class="field-label">Difference</span>
+            <b [style.color]="color(p.on_off_net)">{{ signed(p.on_off_net) }}</b>
+          </div>
+        </div>
+        <p class="muted split-note">
+          Offense <b>{{ signed(p.on_off_offense) }}</b> · Defense <b>{{ signed(p.on_off_defense) }}</b> per 100 possessions.
+          On the floor for {{ pct(p.share_of_team_possessions, 0) }} of his team's possessions.
+        </p>
+        <split-bars [rows]="splitRows()" leftLabel="With him on" rightLabel="With him off" note="The brighter side of each bar is the better team performance." />
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Best teammates</h2>
+          <span class="muted">Two-man net rating, 200+ possessions together</span>
+        </div>
+        @if (teammates().length) {
+          <ol class="mates">
+            @for (row of teammates(); track row.player_ids.join('|')) {
+              <li>
+                <div class="mate-top">
+                  <span>{{ teammateName(row, p.player_id) }}</span>
+                  <b [style.color]="color(row.net_rating)">{{ signed(row.net_rating) }}</b>
+                </div>
+                <div class="mate-bar"><span [style.width.%]="teammateWidth(row.net_rating)" [style.background]="color(row.net_rating)"></span></div>
+                <span class="muted">{{ row.total_possessions.toLocaleString() }} possessions</span>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="muted">No pairing has 200 possessions together under these filters.</p>
+        }
+        <button type="button" class="go" (click)="openLineups(p)">See five-man lineups with {{ p.name }} →</button>
+      </section>
+    }
+  </div>
+</div>

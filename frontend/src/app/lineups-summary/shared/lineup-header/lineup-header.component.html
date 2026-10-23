@@ -1,0 +1,45 @@
+<section class="card header-card" aria-label="Selected lineup">
+  <div class="who">
+    <div class="meta">
+      <span class="team">{{ lineup().team_name }}</span>
+      <span class="muted"><b>{{ lineup().total_possessions }}</b> possessions · <b>{{ lineup().minutes.toFixed(1) }}</b> minutes · <b>{{ lineup().games_played }}</b> games</span>
+    </div>
+    <div class="roster">
+      @for (player of lineup().players; track player.player_id) {
+        <span class="chip">{{ player.name }}@if (player.position) {<small>{{ player.position }}</small>}</span>
+      }
+    </div>
+    <div class="build muted">
+      Avg <b>{{ feetInches(lineup().avg_height_in) }}</b>, <b>{{ lineup().avg_weight_lb.toFixed(0) }}</b> lb
+      @if (build()) { · {{ build() }} }
+      · Pace <b>{{ lineup().pace.toFixed(1) }}</b>
+    </div>
+  </div>
+
+  @if (bars().length > 1) {
+    <div class="trend" role="img" [attr.aria-label]="'Net rating by month: ' + bars().map(b => b.label + ' ' + signed(b.net)).join(', ')">
+      <span class="trend-label">Net rating by month</span>
+      <div class="trend-bars">
+        @for (bar of bars(); track bar.month) {
+          <div class="trend-col" [class.thin]="bar.thin" [title]="bar.title">
+            <div class="trend-plot" [style.height.px]="half * 2">
+              <span
+                class="trend-bar"
+                [style.height.px]="bar.height"
+                [style.background]="bar.color"
+                [style.bottom.px]="bar.up ? half : half - bar.height"
+              ></span>
+              <span class="trend-axis" [style.bottom.px]="half"></span>
+            </div>
+            <span class="trend-month">{{ bar.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="net-headline" [style.color]="color(lineup().net_rating)">
+    {{ signed(lineup().net_rating) }}
+    <small>net rating · <b>{{ lineup().offensive_rating.toFixed(1) }}</b> scored, <b>{{ lineup().defensive_rating.toFixed(1) }}</b> allowed per 100</small>
+  </div>
+</section>

@@ -1,0 +1,79 @@
+@if (store.selected(); as lineup) {
+  <div class="tab-stack">
+    <lineup-header [lineup]="lineup" />
+    <section class="card">
+      <div class="card-head">
+        <h2>Shot chart</h2>
+        <span class="muted">Every field goal attempt with this lineup on the floor · hover a hexagon for its numbers</span>
+      </div>
+      @if (charts(); as charts) {
+        <div class="courts" [class.loading]="store.loading()">
+          <shot-chart [chart]="charts.offense" [label]="lineup.team_abbreviation + ' lineup shooting'" />
+          <shot-chart [chart]="charts.defense" label="Opponents shooting" />
+        </div>
+      } @else {
+        <p class="muted">Loading shots…</p>
+      }
+    </section>
+
+    <div class="tab-grid">
+      <section class="card">
+        <div class="card-head">
+          <h2>Shooting by zone</h2>
+          <span class="muted">Made / attempted · chip shows FG% vs league</span>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Zone</th>
+                <th scope="col">Lineup</th>
+                <th scope="col">FG%</th>
+                <th scope="col">Opponents</th>
+                <th scope="col">FG%</th>
+                <th scope="col">League</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of zones(); track row.label) {
+                <tr>
+                  <th scope="row">{{ row.label }}</th>
+                  <td class="num">{{ row.lineup }}</td>
+                  <td class="num">{{ row.lineupPct }}@if (row.lineupVs) {<span class="vs" [style.border-color]="row.lineupColor">{{ row.lineupVs }}</span>}</td>
+                  <td class="num">{{ row.opponent }}</td>
+                  <td class="num">{{ row.opponentPct }}@if (row.opponentVs) {<span class="vs" [style.border-color]="row.opponentColor">{{ row.opponentVs }}</span>}</td>
+                  <td class="num muted">{{ row.league }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Shot type mix</h2>
+          <span class="muted">Share of attempts · FG% at right</span>
+        </div>
+        @for (type of types(); track type.label) {
+          <div class="type">
+            <div class="type-label">{{ type.label }}</div>
+            @for (bar of [
+              { name: 'Lineup', share: type.lineupShare, fg: type.lineupPct, cls: 'lineup' },
+              { name: 'Opponents', share: type.opponentShare, fg: type.opponentPct, cls: 'opponent' },
+              { name: 'League', share: type.leagueShare, fg: type.leaguePct, cls: 'league' }
+            ]; track bar.name) {
+              <div class="type-bar">
+                <span class="type-name">{{ bar.name }}</span>
+                <span class="type-track"><span [class]="'type-fill ' + bar.cls" [style.width.%]="bar.share"></span></span>
+                <span class="type-value num">{{ bar.share.toFixed(0) }}%</span>
+                <span class="type-fg num muted">{{ bar.fg }}</span>
+              </div>
+            }
+          </div>
+        }
+        <p class="muted note">Dunks, layups and hooks are near the rim; jump shots include every pull-up, step-back and catch-and-shoot.</p>
+      </section>
+    </div>
+  </div>
+}

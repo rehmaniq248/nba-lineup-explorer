@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+svg {
+  display: block;
+  shape-rendering: crispEdges;
+  width: 100%;
+  height: auto;
+}
+
+.grid {
+  stroke: var(--border);
+  stroke-width: 1;
+  stroke-opacity: 0.6;
+  stroke-dasharray: 2 4;
+}
+
+.center {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.tick {
+  font-weight: 700;
+}
+
+.tick,
+.axis,
+.quad {
+  fill: var(--text-muted);
+  font-family: var(--font-data);
+  font-size: 10px;
+}
+
+.axis {
+  font-size: 11px;
+}
+
+.quad {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.bubble {
+  fill-opacity: 0.8;
+  stroke: var(--panel);
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: fill-opacity 0.15s ease;
+
+  &:hover {
+    fill-opacity: 1;
+  }
+
+  &.selected {
+    fill-opacity: 1;
+    stroke: var(--accent-3);
+    stroke-width: 3;
+  }
+}
+
+.hint {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}

@@ -1,0 +1,16 @@
+<div class="heads">
+  <span class="side left-side"><i></i>{{ leftLabel() }}</span>
+  <span class="side right-side">{{ rightLabel() }}<i></i></span>
+</div>
+@for (row of views(); track row.label) {
+  <div class="row">
+    <div class="label">{{ row.label }}@if (row.approx) {<abbr class="approx" [title]="row.approx">≈ Approx.</abbr>}</div>
+    <div class="bar" role="img" [attr.aria-label]="row.label + ': ' + leftLabel() + ' ' + row.leftText + ', ' + rightLabel() + ' ' + row.rightText">
+      <div class="fill" [style.width.%]="row.leftShare" [class.win]="row.winner === 'left'"></div>
+      <div class="rest" [class.win]="row.winner === 'right'"></div>
+      <span class="value left" [class.strong]="row.winner === 'left'">{{ row.leftText }}</span>
+      <span class="value right" [class.strong]="row.winner === 'right'">{{ row.rightText }}</span>
+    </div>
+  </div>
+}
+<p class="note">{{ note() }}</p>

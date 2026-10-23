@@ -1,0 +1,4 @@
+# Only needed to rebuild backend/raw_data from the Kaggle dataset (scripts/build_dataset.py).
+-r requirements.txt
+pyarrow==21.0.0
+kagglehub==1.0.3

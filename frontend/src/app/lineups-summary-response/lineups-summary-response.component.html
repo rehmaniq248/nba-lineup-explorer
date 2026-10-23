@@ -1,0 +1,30 @@
+<section class="api-inspector">
+  <h1>Lineups Summary Responses</h1>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Lineup size</mat-label>
+    <mat-select [(ngModel)]="leagueLineupSize" (selectionChange)="changeLeagueLineupSize()">
+      @for (lineupSize of lineupSizes; track lineupSize.value) {
+        <mat-option [value]="lineupSize.value">{{ lineupSize.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (meta) {
+    <div class="meta">
+      <strong>{{ meta.season }} · {{ meta.source }}</strong>
+      <span>{{ meta.possessions.toLocaleString() }} possessions · {{ meta.shots.toLocaleString() }} shots · {{ meta.players }} players · {{ meta.first_game }} to {{ meta.last_game }}</span>
+      <ul>
+        @for (entry of approximations; track entry.key) {
+          <li><code>offensive_/defensive_{{ entry.key }}</code> <abbr class="approx" [title]="entry.text">≈ Approx.</abbr> {{ entry.text }}</li>
+        }
+        @for (note of meta.notes; track note) {
+          <li>{{ note }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div>API response for {{ leagueEndpoint }} (first 25 rows with 100+ possessions)</div>
+  <pre>{{ leagueApiResponse }}</pre>
+</section>

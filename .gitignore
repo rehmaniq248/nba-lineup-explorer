@@ -1,0 +1,15 @@
+.python-version
+.DS_Store
+
+frontend/node_modules
+frontend/dist/*
+!frontend/dist/3rdpartylicenses.txt
+!frontend/dist/styles.css
+frontend-angular12-backup/
+
+__pycache__/
+*.pgsql
+dbexport.pgsql
+
+.venv/
+backend/raw_data/*.parquet

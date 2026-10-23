@@ -1,0 +1,306 @@
+:host {
+  display: block;
+  color: var(--text);
+}
+
+// KPI row
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.kpi-detail b {
+  color: var(--text);
+}
+
+.kpi-detail {
+  color: var(--text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ring-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+// Ten-step level meter: one lit step per 10% of lineups with a positive net rating.
+.meter {
+  display: flex;
+  align-items: flex-end;
+  flex: none;
+  gap: 3px;
+  height: 44px;
+
+  span {
+    width: 7px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+
+    &.on {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+  }
+}
+
+// Main grid
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.table-card {
+  padding-bottom: 8px;
+}
+
+.table-wrap {
+  max-height: 640px;
+  overflow: auto;
+  margin: 0 -18px;
+  padding: 0 18px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 4px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  font-weight: 500;
+
+  button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &:hover,
+    &.active {
+      color: var(--accent);
+    }
+  }
+
+  &.lineup-col {
+    text-align: left;
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+td {
+  padding: 9px 4px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+td.num {
+  text-align: right;
+  font-family: var(--font-data);
+  font-size: 12px;
+}
+
+tbody tr {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--panel-2);
+  }
+
+  &.selected {
+    background: var(--panel-2);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+}
+
+.lineup-col {
+  min-width: 170px;
+}
+
+.lineup-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatars {
+  display: flex;
+  flex: none;
+
+  span {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    margin-left: -6px;
+    border-radius: 0;
+    background: var(--panel-2);
+    border: 2px solid var(--border);
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--text-muted);
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.team {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.player-names {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.net-col {
+  width: 150px;
+  min-width: 130px;
+  padding-left: 12px;
+  padding-right: 6px;
+}
+
+.net {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.net-track {
+  position: relative;
+  flex: 1;
+  height: 20px;
+}
+
+.net-axis {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--text-muted);
+  opacity: 0.6;
+}
+
+.net-bar {
+  mask-image: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+  position: absolute;
+  top: 4px;
+  height: 12px;
+  border-radius: 0;
+}
+
+.net-value {
+  width: 42px;
+  font-weight: 700;
+  text-align: right;
+  font-family: var(--font-data);
+  font-size: 11px;
+}
+
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.go-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.go-card a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+
+  &:hover .go-label {
+    color: var(--accent);
+  }
+}
+
+.go-card li:last-child a {
+  border-bottom: none;
+}
+
+.go-label {
+  font-size: 14px;
+  font-weight: 700;
+}

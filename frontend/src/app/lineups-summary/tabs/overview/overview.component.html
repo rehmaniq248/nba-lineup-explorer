@@ -1,0 +1,116 @@
+<div class="page-section">
+    <section class="kpis" aria-label="Highlights" >
+      <article class="card kpi ring-card">
+        <div class="meter" aria-hidden="true">
+          @for (step of meterSteps; track step) {
+            <span [class.on]="step < meterLit()" [style.height.px]="10 + step * 3.5"></span>
+          }
+        </div>
+        <div>
+          <div class="kpi-label">Net positive</div>
+          <div class="kpi-value">{{ pct(positiveShare(), 0) }}</div>
+          <div class="kpi-detail"><b>{{ store.visible().length }}</b> shown · <b>{{ store.total() }}</b> match</div>
+        </div>
+      </article>
+      @for (kpi of kpis(); track kpi.label) {
+        <article class="card kpi">
+          <div class="kpi-label">{{ kpi.label }}</div>
+          <div class="kpi-value">{{ kpi.value }}</div>
+          <div class="kpi-detail" [title]="kpi.detail">{{ kpi.detail }}</div>
+        </article>
+      }
+    </section>
+
+  <div class="grid">
+      <section class="card table-card" aria-label="Lineup leaderboard">
+        <div class="card-head">
+          <h2>Leaderboard</h2>
+          <span class="muted">
+            @if (store.total() > pageSize) { Top <b>{{ pageSize }}</b> of <b>{{ store.total() }}</b> · } Click a row to inspect it
+          </span>
+        </div>
+        <div class="table-wrap" [class.loading]="store.loading()">
+          <table>
+            <thead>
+              <tr>
+                <th class="lineup-col" scope="col">Lineup</th>
+                @for (column of columns; track column.sortKey) {
+                  <th scope="col" [attr.aria-sort]="ariaSort(column)" [class.net-col]="column.label === 'Net'">
+                    <button type="button" [title]="column.hint" (click)="store.sortOn(column.sortKey, column.firstOrder)" [class.active]="store.sortBy() === column.sortKey">
+                      {{ column.label }}
+                      @if (store.sortBy() === column.sortKey) { <span aria-hidden="true">{{ store.order() === 'desc' ? '↓' : '↑' }}</span> }
+                    </button>
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (lineup of store.visible(); track lineupKey(lineup)) {
+                <tr
+                  [class.selected]="lineupKey(lineup) === store.selectedId()"
+                  tabindex="0"
+                  (click)="store.select(lineup)"
+                  (keydown.enter)="store.select(lineup)"
+                >
+                  <td class="lineup-col">
+                   <div class="lineup-cell">
+                    <div class="avatars" aria-hidden="true">
+                      @for (player of lineup.players; track player.player_id) {
+                        <span>{{ initials(player.name) }}</span>
+                      }
+                    </div>
+                    <div class="names">
+                      <span class="team">{{ lineup.team_name }}</span>
+                      <span class="player-names" [title]="lineup.players.map(p => p.name).join(', ')">
+                        {{ lineup.players.map(p => p.name).join(', ') }}
+                      </span>
+                    </div>
+                   </div>
+                  </td>
+                  @for (column of columns; track column.sortKey) {
+                    @if (column.label === 'Net') {
+                      <td class="net-col">
+                        <div class="net">
+                          <span class="net-value">{{ signed(lineup.net_rating) }}</span>
+                          <div class="net-track">
+                            <div class="net-axis"></div>
+                            <div
+                              class="net-bar"
+                              [style.width.%]="netBarWidth(lineup.net_rating)"
+                              [style.background]="netColor(lineup.net_rating)"
+                              [style.left.%]="lineup.net_rating >= 0 ? 50 : 50 - netBarWidth(lineup.net_rating)"
+                            ></div>
+                          </div>
+                        </div>
+                      </td>
+                    } @else {
+                      <td class="num">{{ cell(lineup, column) }}</td>
+                    }
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    <div class="col">
+      @if (store.selected(); as lineup) {
+        <lineup-header [lineup]="lineup" />
+        <section class="card go-card" aria-label="Open this lineup in another tab">
+          <div class="card-head"><h2>Dig into this lineup</h2></div>
+          <ul>
+            @for (tab of tabs; track tab.path) {
+              <li>
+                <a [routerLink]="tab.path" queryParamsHandling="preserve">
+                  <span class="go-label">{{ tab.label }}</span>
+                  <span class="muted">{{ tab.detail }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+  </div>
+</div>

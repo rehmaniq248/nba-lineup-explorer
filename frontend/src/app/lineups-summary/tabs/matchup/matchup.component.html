@@ -1,0 +1,64 @@
+@if (store.selected(); as lineup) {
+  <div class="tab-stack">
+    <lineup-header [lineup]="lineup" />
+    <div class="tab-grid">
+      <section class="card">
+        <div class="card-head">
+          <h2>Lineup vs. opponents</h2>
+          <span class="muted">Offense and defense, per possession</span>
+        </div>
+        <split-bars [rows]="rows()" [leftLabel]="lineup.team_name + ' lineup'" note="The brighter side of each bar won that matchup. Turnover rate is won by the lower number." />
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Scoring context</h2>
+          <span class="muted">Points per 100 possessions</span>
+        </div>
+        <split-bars [rows]="context()" [leftLabel]="lineup.team_name + ' lineup'" note="How the points were created. A play can count in more than one row, e.g. a fast-break layup is also a paint score." />
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Shot value</h2>
+          <span class="muted">Estimated from the play-by-play</span>
+        </div>
+        <split-bars
+          [rows]="shotValue()"
+          [leftLabel]="lineup.team_name + ' lineup'"
+          note="≈ Approx. marks stats this dataset doesn't record directly. Hover the badge for how each one is estimated."
+        />
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Where the points came from</h2>
+          <span class="muted">Total points</span>
+        </div>
+        @for (side of [{ name: 'Lineup scoring', data: mix().lineup }, { name: 'Opponents scoring', data: mix().opponent }]; track side.name) {
+          <div class="mix-row">
+            <div class="mix-head"><span>{{ side.name }}</span><b>{{ side.data.total }}</b></div>
+            <div class="mix-bar" role="img" [attr.aria-label]="side.name + ': ' + side.data.total + ' points'">
+              @for (part of side.data.parts; track part.label) {
+                <span [style.width.%]="part.share" [style.background]="part.color" [title]="part.label + ': ' + part.value"></span>
+              }
+            </div>
+          </div>
+        }
+        <ul class="key">
+          @for (slice of slices(); track slice.label) {
+            <li><i [style.background]="slice.color"></i>{{ slice.label }}</li>
+          }
+        </ul>
+        <div class="mix-table">
+          @for (slice of slices(); track slice.label) {
+            <div class="mix-line">
+              <span>{{ slice.label }}</span>
+              <span class="pair"><b>{{ slice.lineup }}</b> <span class="muted">vs</span> <b>{{ slice.opponent }}</b></span>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+}

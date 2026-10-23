@@ -1,0 +1,98 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+figure {
+  margin: 0;
+}
+
+figcaption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.side {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  i {
+    width: 10px;
+    height: 10px;
+    background: var(--lineup);
+  }
+
+  &.opponent i {
+    background: var(--opponent);
+  }
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--panel-2);
+}
+
+.court {
+  fill: none;
+  stroke: var(--court-line);
+  stroke-width: 2.5;
+  opacity: 0.7;
+
+  .rim {
+    stroke: var(--opponent);
+    opacity: 1;
+  }
+}
+
+.hex {
+  stroke: var(--panel);
+  stroke-width: 1;
+
+  &:hover {
+    stroke: var(--text);
+    stroke-width: 2;
+  }
+}
+
+.empty {
+  fill: var(--text-muted);
+  font-size: 18px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.swatches {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+
+  i {
+    width: 12px;
+    height: 12px;
+  }
+}
