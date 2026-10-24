@@ -18,11 +18,12 @@ RAW_DATA_DIR = BASE_DIR / 'raw_data'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'x31d0_@i19bz)q*_nibl8#p224$hu1yhk$or$ew=7j#v5h3%4f'
+# SECURITY WARNING: keep the secret key used in production secret! Production sets DJANGO_SECRET_KEY; the
+# fallback is only for local development.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'local-development-only-not-secret')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production! Production sets DJANGO_DEBUG=0.
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 
 ALLOWED_HOSTS = ['*']
 
