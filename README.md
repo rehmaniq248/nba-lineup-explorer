@@ -1,5 +1,7 @@
 # NBA Lineup Explorer · 2025-26
 
+Live: https://nba-lineup-explorer.vercel.app
+
 A lineup and player-impact dashboard for the 2025-26 NBA season. It rebuilds who was on the floor for every
 possession from play-by-play data, sums each lineup's stats on both ends, and presents them for coaches and
 front offices: leaderboards, matchup splits, shot charts, rebounding and size, ball security and player on/off.
@@ -106,7 +108,8 @@ The backend and database run on Railway; the frontend runs on Vercel (`frontend/
 
 - **Railway**: a Postgres service plus a `backend` service rooted at `backend/`, with
   `DATABASE_URL=${{Postgres.DATABASE_URL}}`. Each deploy runs migrations and `scripts/ingest_raw_data.py`, so
-  there is no separate data-loading step. Without GitHub access, deploy from this folder with
+  there is no separate data-loading step. Railway ignored `backend/railway.json` for CLI uploads, so the start
+  command is also set as the service variable `RAILPACK_START_CMD` (same command as in `railway.json`). Without GitHub access, deploy from this folder with
   `railway up backend --path-as-root --service backend`.
 - **Vercel**: put the backend's public domain in `frontend/src/environments/environment.prod.ts`, then deploy
   `frontend/` (`npx vercel --prod` from that folder, or import the repo with root directory `frontend`).
