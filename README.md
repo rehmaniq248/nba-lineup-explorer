@@ -19,6 +19,10 @@ on Kaggle (built from version 522). `backend/scripts/build_dataset.py` turns it 
 | `possessions.csv.gz` | 262,398 possessions, both five-man units and possession-level stats |
 | `shots.csv.gz` | 234,430 field goal attempts with court location and both lineups |
 
+Teams, games and players are loaded into Postgres. Possessions and shots are not: at ~350 MB as tables they
+would outgrow a small hosted database, so the backend reads the two `.csv.gz` files straight into memory
+(pandas) on its first request and aggregates from there.
+
 How the possessions are built:
 
 - **Lineups**: box-score starters for the first period; for later periods, every player whose first event in
@@ -71,7 +75,7 @@ python -m venv .venv
 
 cd backend
 ../.venv/bin/python manage.py migrate
-PYTHONPATH=. ../.venv/bin/python scripts/ingest_raw_data.py   # about a minute
+PYTHONPATH=. ../.venv/bin/python scripts/ingest_raw_data.py   # teams, games, players (a second)
 ../.venv/bin/python manage.py runserver                       # http://localhost:8000
 ```
 
@@ -98,6 +102,11 @@ npm start        # http://localhost:4200
 
 ## Deploying through Railway
 
-Same layout as before: a Postgres service, a `backend` service rooted at `backend/` and a `frontend` service
-rooted at `frontend/`. Put the backend's public domain in `frontend/src/environments/environment.prod.ts`, then
-load the data with `pg_dump -U nbaapp nba > dbexport.pgsql` and `\i dbexport.pgsql` from `railway connect Postgres`.
+The backend and database run on Railway; the frontend runs on Vercel (`frontend/vercel.json`).
+
+- **Railway**: a Postgres service plus a `backend` service rooted at `backend/`, with
+  `DATABASE_URL=${{Postgres.DATABASE_URL}}`. Each deploy runs migrations and `scripts/ingest_raw_data.py`, so
+  there is no separate data-loading step. Without GitHub access, deploy from this folder with
+  `railway up backend --path-as-root --service backend`.
+- **Vercel**: put the backend's public domain in `frontend/src/environments/environment.prod.ts`, then deploy
+  `frontend/` (`npx vercel --prod` from that folder, or import the repo with root directory `frontend`).

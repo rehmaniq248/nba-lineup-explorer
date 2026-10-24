@@ -1,7 +1,6 @@
-# Loads the files written by scripts/build_dataset.py into the database.
+# Loads the teams, games and players written by scripts/build_dataset.py into the database. Possessions and
+# shots stay in raw_data/*.csv.gz and are read straight into memory by app.helpers.data.
 
-import csv
-import gzip
 import json
 import os
 from pathlib import Path
@@ -12,23 +11,9 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 django.setup()
 
 from django.db import transaction
-from app.dbmodels.models import Game, Team, Player, Possession, Shot
+from app.dbmodels.models import Game, Team, Player
 
 RAW_DATA_DIR = Path(__file__).resolve().parent.parent / 'raw_data'
-BATCH_SIZE = 5000
-
-POSSESSION_COUNTING_FIELDS = (
-    'period', 'fg2_made', 'fg2_attempted', 'fg3_made', 'fg3_attempted', 'fg_made', 'fg_attempted', 'ft_made',
-    'ft_attempted', 'rebounds_offense', 'rebounds_defense', 'rebound_opportunities', 'assists', 'steals',
-    'turnovers', 'blocks', 'offensive_fouls', 'defensive_fouls', 'shooting_fouls', 'points', 'shot_attempts',
-    'shot_attempt_points', 'ft_potential_points', 'transition_take_fouls',
-    'ra_made', 'ra_attempted', 'paint_made', 'paint_attempted', 'mid_made', 'mid_attempted',
-    'corner3_made', 'corner3_attempted', 'atb3_made', 'atb3_attempted',
-    'dunk_made', 'dunk_attempted', 'layup_made', 'layup_attempted', 'jumper_made', 'jumper_attempted',
-    'hook_made', 'hook_attempted',
-    'paint_points', 'fastbreak_points', 'second_chance_points', 'points_off_turnovers',
-)
-
 PLAYER_FIELDS = (
     'name', 'position', 'height_in', 'weight_lb', 'birth_date', 'country', 'school', 'draft_year', 'draft_round',
     'draft_number', 'games', 'minutes_per_game', 'points_per_game', 'rebounds_per_game', 'assists_per_game',
@@ -41,27 +26,8 @@ def load_json(filename):
         return json.load(raw_file)
 
 
-def load_csv(filename):
-    with gzip.open(RAW_DATA_DIR / filename, 'rt', newline='') as raw_file:
-        yield from csv.DictReader(raw_file)
-
-
-def player_ids(raw_value):
-    return [int(player_id) for player_id in raw_value.split(';')]
-
-
-def bulk_create(model, rows):
-    batch = []
-    for row in rows:
-        batch.append(row)
-        if len(batch) == BATCH_SIZE:
-            model.objects.bulk_create(batch)
-            batch = []
-    model.objects.bulk_create(batch)
-
-
 def delete_all():
-    for model in (Shot, Possession, Player, Game, Team):
+    for model in (Player, Game, Team):
         model.objects.all().delete()
 
 
@@ -88,51 +54,10 @@ def ingest_players():
     ])
 
 
-def ingest_possessions():
-    bulk_create(Possession, (
-        Possession(
-            game_id=row['game_id'],
-            offensive_team_id=row['offensive_team_id'],
-            defensive_team_id=row['defensive_team_id'],
-            offensive_player_ids=player_ids(row['offensive_player_ids']),
-            defensive_player_ids=player_ids(row['defensive_player_ids']),
-            seconds=float(row['seconds']),
-            offense_is_home=row['offense_is_home'] == '1',
-            clutch=row['clutch'] == '1',
-            **{field: int(row[field]) for field in POSSESSION_COUNTING_FIELDS},
-        )
-        for row in load_csv('possessions.csv.gz')
-    ))
-
-
-def ingest_shots():
-    bulk_create(Shot, (
-        Shot(
-            game_id=row['game_id'],
-            period=int(row['period']),
-            clutch=row['clutch'] == '1',
-            offensive_team_id=row['offensive_team_id'],
-            defensive_team_id=row['defensive_team_id'],
-            offensive_player_ids=player_ids(row['offensive_player_ids']),
-            defensive_player_ids=player_ids(row['defensive_player_ids']),
-            shooter_id=int(row['shooter_id']),
-            x=float(row['x']),
-            y=float(row['y']),
-            zone=row['zone'],
-            shot_type=row['shot_type'],
-            value=int(row['value']),
-            made=row['made'] == '1',
-        )
-        for row in load_csv('shots.csv.gz')
-    ))
-
-
 if __name__ == '__main__':
     with transaction.atomic():
         delete_all()
         ingest_teams()
         ingest_games()
         ingest_players()
-        ingest_possessions()
-        ingest_shots()
-    print(f'Loaded {Possession.objects.count():,} possessions and {Shot.objects.count():,} shots')
+    print(f'Loaded {Team.objects.count()} teams, {Game.objects.count()} games and {Player.objects.count()} players')

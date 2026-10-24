@@ -1,18 +1,22 @@
-"""In-memory copies of the possession and shot tables, plus the filters every endpoint shares.
+"""In-memory copies of the possession and shot data, plus the filters every endpoint shares.
 
-A season is about 260k possessions, too many to sum row by row in Python on every request, so each table is
-pulled out of Postgres once with COPY and aggregated with pandas.
+A season is about 260k possessions and 230k shots: too many to sum row by row in Python on every request, and at
+~350 MB too big for a small hosted Postgres. So they are read once from the compressed files that
+scripts/build_dataset.py writes (raw_data/possessions.csv.gz and shots.csv.gz, ~5 MB together), joined to the
+games table for dates and game types, and aggregated with pandas.
 """
 
 from __future__ import annotations
 
-import io
 from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 import pandas as pd
-from django.db import connection
+from django.conf import settings
+
+from app.dbmodels.models import Game
 
 SIDES = ('offensive', 'defensive')
 
@@ -103,34 +107,36 @@ class Filters:
     location: Optional[str] = None
 
 
-def _copy_frame(sql: str) -> pd.DataFrame:
-    buffer = io.StringIO()
-    with connection.cursor() as cursor:
-        cursor.copy_expert(f'COPY ({sql}) TO STDOUT WITH CSV HEADER', buffer)
-    buffer.seek(0)
-    return pd.read_csv(buffer)
+def _data_file(name: str) -> Path:
+    return Path(settings.RAW_DATA_DIR) / name
 
 
 def _split_players(frame: pd.DataFrame, column: str, names: tuple[str, ...]) -> pd.DataFrame:
-    players = frame.pop(column).str.strip('{}').str.split(',', expand=True).astype('int64')
+    players = frame.pop(column).astype(str).str.split(';', expand=True).astype('int64')
     players.columns = list(names)
     return pd.concat([frame, players], axis=1)
 
 
-def _bools(frame: pd.DataFrame, *columns: str) -> None:
-    for column in columns:
-        frame[column] = frame[column] == 't'
+def _games() -> pd.DataFrame:
+    games = pd.DataFrame.from_records(
+        Game.objects.values('id', 'date', 'game_type', 'home_team_id'),
+        columns=['id', 'date', 'game_type', 'home_team_id'],
+    )
+    games['date'] = games['date'].astype(str)
+    return games.rename(columns={'id': 'game_id'})
+
+
+def _with_games(frame: pd.DataFrame) -> pd.DataFrame:
+    """Attach each row's date and game type. Rows for games missing from the database are dropped."""
+    return frame.merge(_games(), on='game_id', how='inner')
 
 
 @lru_cache(maxsize=1)
 def possessions() -> pd.DataFrame:
-    stats = ', '.join(f'p.{stat}' for stat in (*SUMMED_STATS, *EXTRA_SUMMED_STATS))
-    frame = _copy_frame(
-        'SELECT p.game_id, g.date, g.game_type, p.period, p.offensive_team_id, p.defensive_team_id, '
-        f'p.offensive_player_ids, p.defensive_player_ids, p.offense_is_home, p.clutch, {stats} '
-        'FROM possession p JOIN game g ON g.id = p.game_id'
-    )
-    _bools(frame, 'offense_is_home', 'clutch')
+    frame = _with_games(pd.read_csv(_data_file('possessions.csv.gz')))
+    frame = frame.drop(columns=['home_team_id'])
+    frame['offense_is_home'] = frame['offense_is_home'].astype(bool)
+    frame['clutch'] = frame['clutch'].astype(bool)
     frame = _split_players(frame, 'offensive_player_ids', OFFENSE_PLAYERS)
     frame = _split_players(frame, 'defensive_player_ids', DEFENSE_PLAYERS)
     frame['month'] = frame['date'].str[:7]
@@ -142,19 +148,16 @@ def possessions() -> pd.DataFrame:
 
 @lru_cache(maxsize=1)
 def shots() -> pd.DataFrame:
-    frame = _copy_frame(
-        'SELECT s.game_id, g.date, g.game_type, s.period, s.clutch, s.offensive_team_id, s.defensive_team_id, '
-        's.offensive_player_ids, s.defensive_player_ids, s.shooter_id, s.x, s.y, s.zone, s.shot_type, s.value, '
-        's.made, g.home_team_id FROM shot s JOIN game g ON g.id = s.game_id'
-    )
-    _bools(frame, 'clutch', 'made')
+    frame = _with_games(pd.read_csv(_data_file('shots.csv.gz'), dtype={'zone': str, 'shot_type': str}))
+    frame['clutch'] = frame['clutch'].astype(bool)
+    frame['made'] = frame['made'].astype(bool)
     frame['offense_is_home'] = frame.pop('home_team_id') == frame['offensive_team_id']
     frame = _split_players(frame, 'offensive_player_ids', OFFENSE_PLAYERS)
     return _split_players(frame, 'defensive_player_ids', DEFENSE_PLAYERS)
 
 
 def clear_cache() -> None:
-    """Drop every cached frame and aggregate, e.g. after re-ingesting or between tests."""
+    """Drop every cached frame and aggregate, e.g. after rebuilding the data or between tests."""
     from app.helpers import lineups, players, shots as shot_helpers
 
     possessions.cache_clear()

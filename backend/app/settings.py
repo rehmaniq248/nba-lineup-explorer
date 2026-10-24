@@ -11,6 +11,9 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Possession and shot files written by scripts/build_dataset.py, read into memory by app.helpers.data.
+RAW_DATA_DIR = BASE_DIR / 'raw_data'
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/

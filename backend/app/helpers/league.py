@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.dbmodels.models import Game, Player, Possession, Shot
-from app.helpers.data import APPROXIMATIONS, CONTEXT_POINTS, SHOT_TYPES, SHOT_ZONES, Filters, game_mask, possessions
+from app.dbmodels.models import Game, Player
+from app.helpers.data import (
+    APPROXIMATIONS, CONTEXT_POINTS, SHOT_TYPES, SHOT_ZONES, Filters, game_mask, possessions, shots,
+)
 from app.helpers.lineups import ratio
 
 
@@ -47,8 +49,8 @@ def get_meta() -> dict[str, Any]:
         'last_game': last.date.isoformat() if last else None,
         'games': {game_type: games.filter(game_type=game_type).count()
                   for game_type in ('Regular Season', 'Play-In', 'Playoffs')},
-        'possessions': Possession.objects.count(),
-        'shots': Shot.objects.count(),
+        'possessions': len(possessions()),
+        'shots': len(shots()),
         'players': Player.objects.count(),
         'approximations': APPROXIMATIONS,
         'notes': [

@@ -1,8 +1,12 @@
 import datetime
+import shutil
+import tempfile
+from pathlib import Path
 
-from django.test import TestCase
+import pandas as pd
+from django.test import TestCase, override_settings
 
-from app.dbmodels.models import Game, Player, Possession, Shot, Team
+from app.dbmodels.models import Game, Player, Team
 from app.helpers.data import clear_cache
 from app.helpers.lineups import get_lineup_league_summary_stats
 from app.helpers.players import get_player_on_off_stats
@@ -23,6 +27,22 @@ STAT_DEFAULTS = {
 
 
 class LineupSummaryTests(TestCase):
+    """Possessions and shots are written to a temporary raw_data folder, the way build_dataset.py writes them."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.data_dir = Path(tempfile.mkdtemp())
+        cls.settings_override = override_settings(RAW_DATA_DIR=cls.data_dir)
+        cls.settings_override.enable()
+        cls.possession_rows = []
+        super().setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        cls.settings_override.disable()
+        shutil.rmtree(cls.data_dir, ignore_errors=True)
+
     @classmethod
     def setUpTestData(cls):
         cls.team_a = Team.objects.create(id=1, name='A Team', city='A', nickname='Team', abbreviation='AAA')
@@ -42,21 +62,27 @@ class LineupSummaryTests(TestCase):
                            rebound_opportunities=1, rebounds_offense=1, mid_attempted=1)
         cls.add_possession(cls.team_b, cls.team_a, [*cls.a[:4], cls.a_sub], points=3, fg3_made=1, fg3_attempted=1,
                            fg_made=1, fg_attempted=1, offense_is_home=False, clutch=True)
-        Shot.objects.create(
-            game=cls.game, period=1, clutch=False, offensive_team=cls.team_a, defensive_team=cls.team_b,
-            offensive_player_ids=[p.id for p in cls.a], defensive_player_ids=[p.id for p in cls.b],
-            shooter_id=cls.a[0].id, x=25, y=6, zone='ra', shot_type='layup', value=2, made=True,
-        )
+        pd.DataFrame(cls.possession_rows).to_csv(cls.data_dir / 'possessions.csv.gz', index=False)
+        pd.DataFrame([{
+            'game_id': cls.game.id, 'period': 1, 'clutch': 0, 'offensive_team_id': cls.team_a.id,
+            'defensive_team_id': cls.team_b.id, 'offensive_player_ids': cls.ids(cls.a),
+            'defensive_player_ids': cls.ids(cls.b), 'shooter_id': cls.a[0].id, 'x': 25, 'y': 6, 'zone': 'ra',
+            'shot_type': 'layup', 'value': 2, 'made': 1,
+        }]).to_csv(cls.data_dir / 'shots.csv.gz', index=False)
+
+    @staticmethod
+    def ids(players):
+        return ';'.join(str(p.id) for p in players)
 
     @classmethod
     def add_possession(cls, offense, defense, a_players, **stats):
         players = {cls.team_a: a_players, cls.team_b: cls.b}
-        Possession.objects.create(
-            game=cls.game, offensive_team=offense, defensive_team=defense,
-            offensive_player_ids=[p.id for p in players[offense]],
-            defensive_player_ids=[p.id for p in players[defense]],
-            **{**STAT_DEFAULTS, **stats},
-        )
+        row = {**STAT_DEFAULTS, **stats}
+        cls.possession_rows.append({
+            'game_id': cls.game.id, 'offensive_team_id': offense.id, 'defensive_team_id': defense.id,
+            'offensive_player_ids': cls.ids(players[offense]), 'defensive_player_ids': cls.ids(players[defense]),
+            **row, 'offense_is_home': int(row['offense_is_home']), 'clutch': int(row['clutch']),
+        })
 
     def setUp(self):
         clear_cache()
